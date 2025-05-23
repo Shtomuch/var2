@@ -15,7 +15,7 @@ TEST_MEDIA_ROOT = tempfile.mkdtemp()
 @override_settings(MEDIA_ROOT=TEST_MEDIA_ROOT)
 class GalleryViewsTest(TestCase):
     def setUp(self):
-        # Готуємо тимчасовий файл-зображення
+        # Готуємо тимчасовий файл-зображення (1×2 px GIF)
         small_gif = (
             b"\x47\x49\x46\x38\x39\x61\x02\x00"
             b"\x01\x00\x80\x00\x00\x00\x00\x00"
@@ -48,24 +48,26 @@ class GalleryViewsTest(TestCase):
         self.img_tree.categories.add(self.cat_nature)
         self.img_city.categories.add(self.cat_city)
 
-        def test_gallery_view_status_and_template(self):
-            resp = self.client.get(reverse("gallery:gallery_view"))
-            self.assertEqual(resp.status_code, 200)
-            self.assertTemplateUsed(resp, "gallery.html")
 
-        def test_gallery_view_context_contains_categories(self):
-            resp = self.client.get(reverse("gallery:gallery_view"))
-            self.assertIn("categories", resp.context)
-            self.assertEqual(resp.context["categories"].count(), 2)
 
-        def test_image_detail_status_and_template(self):
-            resp = self.client.get(
-                reverse("gallery:image_detail", args=[self.img_tree.pk])
-            )
-            self.assertEqual(resp.status_code, 200)
-            self.assertTemplateUsed(resp, "image_detail.html")
-            self.assertEqual(resp.context["image"], self.img_tree)
+    def test_gallery_view_status_and_template(self):
+        resp = self.client.get(reverse("gallery:gallery_view"))
+        self.assertEqual(resp.status_code, 200)
+        self.assertTemplateUsed(resp, "gallery.html")
 
-        def test_image_detail_returns_404_for_unknown_id(self):
-            resp = self.client.get(reverse("gallery:image_detail", args=[9999]))
-            self.assertEqual(resp.status_code, 404)
+    def test_gallery_view_context_contains_categories(self):
+        resp = self.client.get(reverse("gallery:gallery_view"))
+        self.assertIn("categories", resp.context)
+        self.assertEqual(resp.context["categories"].count(), 2)
+
+    def test_image_detail_status_and_template(self):
+        resp = self.client.get(
+            reverse("gallery:image_detail", args=[self.img_tree.pk])
+        )
+        self.assertEqual(resp.status_code, 200)
+        self.assertTemplateUsed(resp, "image_detail.html")
+        self.assertEqual(resp.context["image"], self.img_tree)
+
+    def test_image_detail_returns_404_for_unknown_id(self):
+        resp = self.client.get(reverse("gallery:image_detail", args=[9999]))
+        self.assertEqual(resp.status_code, 404)
