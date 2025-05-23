@@ -47,3 +47,13 @@ class GalleryViewsTest(TestCase):
 
         self.img_tree.categories.add(self.cat_nature)
         self.img_city.categories.add(self.cat_city)
+
+        def test_gallery_view_status_and_template(self):
+            resp = self.client.get(reverse("gallery:gallery_view"))
+            self.assertEqual(resp.status_code, 200)
+            self.assertTemplateUsed(resp, "gallery.html")
+
+        def test_gallery_view_context_contains_categories(self):
+            resp = self.client.get(reverse("gallery:gallery_view"))
+            self.assertIn("categories", resp.context)
+            self.assertEqual(resp.context["categories"].count(), 2)
