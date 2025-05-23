@@ -57,3 +57,15 @@ class GalleryViewsTest(TestCase):
             resp = self.client.get(reverse("gallery:gallery_view"))
             self.assertIn("categories", resp.context)
             self.assertEqual(resp.context["categories"].count(), 2)
+
+        def test_image_detail_status_and_template(self):
+            resp = self.client.get(
+                reverse("gallery:image_detail", args=[self.img_tree.pk])
+            )
+            self.assertEqual(resp.status_code, 200)
+            self.assertTemplateUsed(resp, "image_detail.html")
+            self.assertEqual(resp.context["image"], self.img_tree)
+
+        def test_image_detail_returns_404_for_unknown_id(self):
+            resp = self.client.get(reverse("gallery:image_detail", args=[9999]))
+            self.assertEqual(resp.status_code, 404)
